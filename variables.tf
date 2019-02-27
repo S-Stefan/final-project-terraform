@@ -1,13 +1,13 @@
 variable "app_name" {
-  default = "aidan-app-tf"
+  default = "eng22-app-tf"
 }
 
 variable "db_name" {
-  default = "aidan-db-tf"
+  default = "eng22-db-tf"
 }
 
 variable "app_ami_id" {
-  default = "ami-0978955de6818982d"
+  default = "ami-0672304de0a0ed8c3"
 }
 
 variable "db_ami_id" {

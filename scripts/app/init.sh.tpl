@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd /home/ubuntu/app
-npm install
-pm2 start app.js
+echo "export DB_HOST=mongodb://${private_ip}:27017/posts" >> /home/ubuntu/.bashrc
+source /home/ubuntu/.bashrc
 
-export DB_HOST="mongodb://${private_ip}:27017/posts"
-export TEST="test"
+npm install
+cd /home/ubuntu/app
+pm2 start app.js
