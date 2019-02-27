@@ -1,0 +1,5 @@
+.terraform/
+Berksfile.lock
+terraform.tfstate
+terraform.tfstate.backup
+cookbooks/
