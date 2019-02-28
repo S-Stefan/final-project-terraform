@@ -62,7 +62,7 @@ resource "aws_network_acl" "db_nacl" {
 
 resource "aws_subnet" "db_subnet" {
   vpc_id = "${var.vpc_id}"
-  cidr_block = "11.0.11.0/24"
+  cidr_block = "11.0.14.0/24"
   availability_zone = "eu-west-1c"
   tags {
     Name = "${var.db_name}-subnet"
@@ -106,6 +106,7 @@ resource "aws_route_table_association" "db_association" {
 
 data "aws_ami" "db_ami" {
   most_recent = true
+  owners = ["self"]
 
   filter {
     name = "image-id"
