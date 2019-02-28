@@ -1,9 +1,13 @@
+variable "name" {
+  default = "eng22"
+}
+
 variable "app_name" {
-  default = "eng22-app-tf"
+  default = "eng22-app"
 }
 
 variable "db_name" {
-  default = "eng22-db-tf"
+  default = "eng22-db"
 }
 
 variable "app_ami_id" {

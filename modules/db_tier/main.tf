@@ -7,7 +7,7 @@ resource "aws_instance" "db_instance" {
   subnet_id = "${aws_subnet.db_subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.db_sg.id}"]
   tags {
-    Name = "eng22-db"
+    Name = "${var.db_name}"
   }
 }
 

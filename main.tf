@@ -7,7 +7,7 @@ provider "aws" {
 resource "aws_vpc" "vpc" {
   cidr_block = "11.0.0.0/16"
   tags {
-    Name = "eng22-tf-vpc"
+    Name = "${var.name}-vpc"
   }
 }
 
@@ -17,7 +17,7 @@ resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = "${aws_vpc.vpc.id}"
 
   tags = {
-    Name = "eng22-tf-ig"
+    Name = "${var.name}-ig"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_route_table" "route_table" {
   }
 
   tags {
-    Name = "eng22-tf-route-table"
+    Name = "${var.name}-route-table"
   }
 
 }

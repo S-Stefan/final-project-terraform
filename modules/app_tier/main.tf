@@ -175,8 +175,8 @@ resource "aws_launch_configuration" "app_launch_conf" {
   image_id = "${data.aws_ami.app_ami.id}"
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  user_data = "${data.template_file.app_init.rendered}"
   security_groups = ["${aws_security_group.app_sg.id}"]
+  user_data = "${data.template_file.app_init.rendered}"
 }
 
 # Auto Scaling Group
