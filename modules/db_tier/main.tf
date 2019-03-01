@@ -35,6 +35,15 @@ resource "aws_network_acl" "db_nacl" {
     cidr_block = "0.0.0.0/0"
   }
 
+  ingress {
+    rule_no = 120
+    action = "allow"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_block = "0.0.0.0/0"
+  }
+
   egress {
     rule_no = 100
     action = "allow"
@@ -67,7 +76,6 @@ resource "aws_subnet" "db_subnet" {
   tags {
     Name = "${var.db_name}-subnet"
   }
-
 }
 
 # Security Group
@@ -80,6 +88,13 @@ resource "aws_security_group" "db_sg" {
     to_port     = 27017
     protocol    = "tcp"
     security_groups = ["${var.app_security_group_id}"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["62.249.208.122/32"]
   }
 
   egress {
