@@ -144,7 +144,7 @@ resource "aws_route_table_association" "app_association-c" {
   route_table_id = "${var.route_table_id}"
 }
 
-# Template
+# Templates
 
 data "template_file" "app_init" {
   template = "${file("scripts/app/init.sh.tpl")}"
@@ -207,6 +207,7 @@ resource "aws_launch_configuration" "app_launch_conf" {
   associate_public_ip_address = true
   security_groups = ["${aws_security_group.app_sg.id}"]
   user_data = "${data.template_file.app_init.rendered}"
+
 }
 
 # Auto Scaling Group
