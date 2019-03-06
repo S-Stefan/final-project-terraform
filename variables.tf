@@ -15,5 +15,5 @@ variable "app_ami_id" {
 }
 
 variable "db_ami_id" {
-  default = "ami-09fb8c73b80f759d4"
+  default = "ami-0d133d6eafbc7a1d4"
 }
