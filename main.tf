@@ -36,6 +36,22 @@ resource "aws_route_table" "route_table" {
 
 }
 
+# Route 53
+
+resource "aws_route53_record" "r53_record" {
+  zone_id = "Z3CCIZELFLJ3SC"
+  name    = "eng22"
+  type    = "A"
+
+  alias {
+    name                   = "${module.app.lb_dns_name}"
+    zone_id                = "${module.app.lb_zone_id}"
+    evaluate_target_health = true
+  }
+}
+
+# App Module
+
 module "app" {
   source = "modules/app_tier"
   vpc_id = "${aws_vpc.vpc.id}"
@@ -44,6 +60,8 @@ module "app" {
   route_table_id = "${aws_route_table.route_table.id}"
   db_instance_private_ip = "${module.db.instance_private_ip}"
 }
+
+# DB Module
 
 module "db" {
   source = "modules/db_tier"
