@@ -59,6 +59,8 @@ module "app" {
   app_ami_id = "${var.app_ami_id}"
   route_table_id = "${aws_route_table.route_table.id}"
   db_instance_private_ip = "${module.db.instance_private_ip}"
+  db_instance_private_ip_secondary_1 = "${module.db.instance_private_ip_secondary_1}"
+  db_instance_private_ip_secondary_2 = "${module.db.instance_private_ip_secondary_2}"
 }
 
 # DB Module
