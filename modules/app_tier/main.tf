@@ -23,15 +23,6 @@ resource "aws_network_acl" "app_nacl" {
   }
 
   ingress {
-    rule_no = 130
-    action = "allow"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_block = "86.150.36.42/32"
-  }
-
-  ingress {
     rule_no = 120
     action = "allow"
     from_port = 1024
@@ -123,13 +114,6 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["62.249.208.122/32"]
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["86.150.36.42/32"]
-  }
-
   egress {
     from_port       = 0
     to_port         = 0
@@ -166,6 +150,8 @@ data "template_file" "app_init" {
   template = "${file("scripts/app/init.sh.tpl")}"
   vars {
     private_ip = "${var.db_instance_private_ip}"
+    private_ip_secondary_1 = "${var.db_instance_private_ip_secondary_1}"
+    private_ip_secondary_2 = "${var.db_instance_private_ip_secondary_2}"
   }
 
 }
