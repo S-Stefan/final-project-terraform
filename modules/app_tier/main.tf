@@ -2,7 +2,7 @@
 
 resource "aws_network_acl" "app_nacl" {
   vpc_id = "${var.vpc_id}"
-  subnet_ids = ["${aws_subnet.app_subnet.id}"]
+  subnet_ids = ["${aws_subnet.app_subnet-a.id}", "${aws_subnet.app_subnet-b.id}", "${aws_subnet.app_subnet-c.id}"]
 
   ingress {
     rule_no = 100
@@ -65,15 +65,34 @@ resource "aws_network_acl" "app_nacl" {
 
 # Subnet
 
-resource "aws_subnet" "app_subnet" {
+resource "aws_subnet" "app_subnet-a" {
   vpc_id = "${var.vpc_id}"
   cidr_block = "11.0.10.0/24"
+  availability_zone = "eu-west-1a"
+  map_public_ip_on_launch = "true"
+  tags {
+    Name = "${var.app_name}-subnet-a"
+  }
+}
+
+resource "aws_subnet" "app_subnet-b" {
+  vpc_id = "${var.vpc_id}"
+  cidr_block = "11.0.11.0/24"
+  availability_zone = "eu-west-1b"
+  map_public_ip_on_launch = "true"
+  tags {
+    Name = "${var.app_name}-subnet-b"
+  }
+}
+
+resource "aws_subnet" "app_subnet-c" {
+  vpc_id = "${var.vpc_id}"
+  cidr_block = "11.0.12.0/24"
   availability_zone = "eu-west-1c"
   map_public_ip_on_launch = "true"
   tags {
-    Name = "${var.app_name}-subnet"
+    Name = "${var.app_name}-subnet-c"
   }
-
 }
 
 # Security Group
@@ -86,6 +105,13 @@ resource "aws_security_group" "app_sg" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["62.249.208.122/32"]
   }
 
   egress {
@@ -103,17 +129,29 @@ resource "aws_security_group" "app_sg" {
 
 # Route Table Association
 
-resource "aws_route_table_association" "app_association" {
-  subnet_id = "${aws_subnet.app_subnet.id}"
+resource "aws_route_table_association" "app_association-a" {
+  subnet_id = "${aws_subnet.app_subnet-a.id}"
   route_table_id = "${var.route_table_id}"
 }
 
-# Template
+resource "aws_route_table_association" "app_association-b" {
+  subnet_id = "${aws_subnet.app_subnet-b.id}"
+  route_table_id = "${var.route_table_id}"
+}
+
+resource "aws_route_table_association" "app_association-c" {
+  subnet_id = "${aws_subnet.app_subnet-c.id}"
+  route_table_id = "${var.route_table_id}"
+}
+
+# Templates
 
 data "template_file" "app_init" {
   template = "${file("scripts/app/init.sh.tpl")}"
   vars {
     private_ip = "${var.db_instance_private_ip}"
+    private_ip_secondary_1 = "${var.db_instance_private_ip_secondary_1}"
+    private_ip_secondary_2 = "${var.db_instance_private_ip_secondary_2}"
   }
 
 }
@@ -124,7 +162,7 @@ resource "aws_lb" "app_load_balancer" {
   name = "${var.app_name}-lb"
   internal = false
   load_balancer_type = "network"
-  subnets = ["${aws_subnet.app_subnet.id}"]
+  subnets = ["${aws_subnet.app_subnet-a.id}", "${aws_subnet.app_subnet-b.id}", "${aws_subnet.app_subnet-c.id}"]
 }
 
 # Target Group
@@ -154,6 +192,7 @@ resource "aws_lb_listener" "ssh" {
 
 data "aws_ami" "app_ami" {
   most_recent = true
+  owners = ["self"]
 
   filter {
     name = "image-id"
@@ -168,18 +207,19 @@ resource "aws_launch_configuration" "app_launch_conf" {
   image_id = "${data.aws_ami.app_ami.id}"
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  user_data = "${data.template_file.app_init.rendered}"
   security_groups = ["${aws_security_group.app_sg.id}"]
+  user_data = "${data.template_file.app_init.rendered}"
+
 }
 
 # Auto Scaling Group
 
 resource "aws_autoscaling_group" "app_scaling_group" {
   name = "${var.app_name}-scale-group"
-  max_size = 1
-  min_size = 1
+  max_size = 3
+  min_size = 3
   launch_configuration = "${aws_launch_configuration.app_launch_conf.name}"
-  vpc_zone_identifier = ["${aws_subnet.app_subnet.id}"]
+  vpc_zone_identifier = ["${aws_subnet.app_subnet-a.id}", "${aws_subnet.app_subnet-b.id}", "${aws_subnet.app_subnet-c.id}"]
 
   tag {
     key = "Name"
